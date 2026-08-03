@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: secureshare-backend
+    ports:
+      - "8000:8000"
+    volumes:
+      # Persist the SQLite database
+      - secureshare_db:/app/secureshare.db
+      # Persist the uploaded encrypted files
+      - secureshare_storage:/app/storage
+    environment:
+      - DATABASE_URL=sqlite:///./secureshare.db
+      # Add other environment variables here if needed
+    networks:
+      - secureshare-network
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: secureshare-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - secureshare-network
+    restart: unless-stopped
+
+volumes:
+  secureshare_db:
+    name: secureshare_db
+  secureshare_storage:
+    name: secureshare_storage
+
+networks:
+  secureshare-network:
+    name: secureshare-network
+    driver: bridge

@@ -1,0 +1,20 @@
+# Node
+node_modules/
+dist/
+.DS_Store
+
+# Python
+venv/
+env/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Environment Variables
+.env
+
+# Database & Storage
+*.db
+secureshare.db
+storage/
+/backend/storage/
