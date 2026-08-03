@@ -2,6 +2,11 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 from app.api.routes import auth, qr, files, users
+from app.db.session import engine
+from app.db.base import Base
+
+# Ensure tables are created on startup (especially important for Render's ephemeral free disk!)
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title=settings.PROJECT_NAME, version="1.0.0")
 
