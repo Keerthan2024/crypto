@@ -35,14 +35,12 @@ const Download = () => {
 
     setIsDownloading(true);
     
-    // Sanitize key in case user pasted the raw JSON string or literal \n characters
     let sanitizedKey = privateKey;
     try {
         const parsed = JSON.parse(sanitizedKey);
         if (parsed.private_key) sanitizedKey = parsed.private_key;
     } catch(e) {}
-    sanitizedKey = sanitizedKey.replace(/\\n/g, '\n');
-    sanitizedKey = sanitizedKey.replace(/\\r/g, '');
+    sanitizedKey = sanitizedKey.replace(/\\n/g, '\n').replace(/\\r/g, '');
 
     try {
       const response = await fileApi.downloadFile(shareToken, sanitizedKey);
@@ -85,89 +83,82 @@ const Download = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[75vh] w-full mt-8 animate-fade-in-up">
-      <div className="glass-panel p-8 md:p-12 rounded-3xl max-w-xl w-full relative overflow-hidden">
-        {/* Glow behind form */}
-        <div className="absolute top-0 left-0 w-64 h-64 bg-green-500/10 rounded-full blur-[60px] pointer-events-none"></div>
+    <div className="flex flex-col items-center justify-center min-h-[80vh] px-4 w-full animate-fade-in-up">
+      <div className="w-full max-w-lg sec-card p-8 md:p-10 relative overflow-hidden">
         
-        <div className="relative z-10">
-          <h1 className="text-3xl font-black mb-2 text-white tracking-tight">Incoming Payload</h1>
-          <p className="text-gray-400 text-sm mb-8 font-medium">End-to-end encryption active. Provide your key to unlock.</p>
+        <div className="absolute top-0 left-0 right-0 h-[2px] bg-[var(--color-brand-primary)]/20"></div>
+        
+        <div className="text-center mb-8">
+          <svg className="w-10 h-10 mx-auto text-[var(--color-brand-primary)] mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+          </svg>
+          <h1 className="text-2xl font-bold tracking-tight text-[var(--color-text-primary)]">Incoming Payload</h1>
+          <p className="text-[var(--color-text-muted)] text-[14px] mt-2">End-to-end encryption active. Provide your key to unlock.</p>
+        </div>
 
-          {/* Status Badge */}
-          <div className="mb-8 p-1 rounded-full bg-black/40 border border-white/5 inline-flex">
+        {/* Status Badge */}
+        <div className="mb-8 flex justify-center">
+          <div className="px-4 py-2 rounded-full bg-[var(--color-bg-base)] border border-[var(--color-border-subtle)] inline-flex">
             {linkStatus === 'checking' && (
-              <span className="text-gray-400 px-4 py-1.5 text-xs font-bold tracking-widest uppercase">Initializing...</span>
+              <span className="text-[var(--color-text-muted)] text-[11px] font-bold tracking-widest uppercase">Initializing...</span>
             )}
             {linkStatus === 'valid' && (
-              <span className="text-green-400 px-4 py-1.5 text-xs font-bold tracking-widest uppercase flex items-center">
-                <span className="w-2 h-2 rounded-full bg-green-500 mr-2 animate-pulse"></span>
+              <span className="text-[var(--color-brand-primary)] text-[11px] font-bold tracking-widest uppercase flex items-center">
+                <span className="w-2 h-2 rounded-full bg-[var(--color-brand-primary)] mr-2 animate-pulse"></span>
                 Secure Link Valid
               </span>
             )}
             {linkStatus === 'used' && (
-              <span className="text-yellow-500 px-4 py-1.5 text-xs font-bold tracking-widest uppercase flex items-center">
+              <span className="text-yellow-500 text-[11px] font-bold tracking-widest uppercase flex items-center">
                 <span className="w-2 h-2 rounded-full bg-yellow-500 mr-2"></span>
                 Link Burned (Already Used)
               </span>
             )}
             {linkStatus === 'expired' && (
-              <span className="text-red-400 px-4 py-1.5 text-xs font-bold tracking-widest uppercase flex items-center">
+              <span className="text-red-400 text-[11px] font-bold tracking-widest uppercase flex items-center">
                  <span className="w-2 h-2 rounded-full bg-red-500 mr-2"></span>
                 Link Expired
               </span>
             )}
             {linkStatus === 'error' && (
-              <span className="text-red-500 px-4 py-1.5 text-xs font-bold tracking-widest uppercase flex items-center">
+              <span className="text-red-500 text-[11px] font-bold tracking-widest uppercase flex items-center">
                  <span className="w-2 h-2 rounded-full bg-red-500 mr-2"></span>
                 Invalid Token
               </span>
             )}
           </div>
-
-          {linkStatus === 'valid' && (
-            <div className="space-y-6">
-              <div>
-                <label className="block text-gray-300 font-bold mb-2 text-xs uppercase tracking-wider flex justify-between">
-                  <span>RSA-2048 Private Key</span>
-                  <span className="text-cyan-500">.pem format</span>
-                </label>
-                <div className="relative">
-                  <textarea
-                    rows="8"
-                    className="w-full glass-input rounded-xl p-4 font-mono text-xs leading-relaxed text-cyan-100"
-                    placeholder="-----BEGIN PRIVATE KEY-----&#10;...&#10;-----END PRIVATE KEY-----"
-                    value={privateKey}
-                    onChange={(e) => setPrivateKey(e.target.value)}
-                    spellCheck="false"
-                  ></textarea>
-                  <div className="absolute top-2 right-2 flex space-x-1 pointer-events-none">
-                     {/* Decorative lock icon */}
-                     <svg className="w-4 h-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
-                  </div>
-                </div>
-              </div>
-
-              <button
-                onClick={handleDownload}
-                disabled={isDownloading || !privateKey}
-                className={`w-full font-bold py-3.5 px-4 rounded-xl transition duration-300 flex items-center justify-center tracking-wide ${
-                  isDownloading || !privateKey ? 'bg-gray-800 text-gray-500 cursor-not-allowed' : 'glass-button hover:shadow-[0_0_20px_rgba(34,197,94,0.4)] from-cyan-600 to-green-500'
-                }`}
-              >
-                {isDownloading ? (
-                  <>
-                    <svg className="animate-spin h-5 w-5 mr-3" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                    </svg>
-                    Decrypting & Verifying Integrity...
-                  </>
-                ) : 'Authorize Decryption & Download'}
-              </button>
-            </div>
-          )}
         </div>
+
+        {linkStatus === 'valid' && (
+          <div className="space-y-6">
+            <div>
+              <label className="block text-[12px] font-semibold text-[var(--color-text-secondary)] uppercase tracking-wider mb-2 flex justify-between">
+                <span>RSA-2048 Private Key</span>
+                <span className="text-[var(--color-brand-primary)]/70">.pem format</span>
+              </label>
+              <div className="relative">
+                <textarea
+                  rows="8"
+                  className="sec-input w-full p-4 font-mono text-[13px] leading-relaxed text-[var(--color-text-primary)]"
+                  placeholder="-----BEGIN PRIVATE KEY-----&#10;...&#10;-----END PRIVATE KEY-----"
+                  value={privateKey}
+                  onChange={(e) => setPrivateKey(e.target.value)}
+                  spellCheck="false"
+                ></textarea>
+              </div>
+            </div>
+
+            <button
+              onClick={handleDownload}
+              disabled={isDownloading || !privateKey}
+              className="sec-btn w-full py-3.5 rounded-xl text-[15px] mt-4"
+            >
+              {isDownloading ? (
+                <svg className="animate-spin h-5 w-5 mx-auto text-[var(--color-text-primary)]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+              ) : 'Authorize Decryption'}
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
