@@ -5,6 +5,7 @@ import { authApi } from '../api/authApi';
 
 const Register = () => {
   const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -15,6 +16,7 @@ const Register = () => {
     try {
       await authApi.register({
         username,
+        email,
         password,
       });
       toast.success('Registration successful. Please authenticate.');
@@ -43,7 +45,7 @@ const Register = () => {
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label className="block text-[12px] font-semibold text-[var(--color-text-secondary)] uppercase tracking-wider mb-2">New Identifier</label>
+            <label className="block text-[12px] font-semibold text-[var(--color-text-secondary)] uppercase tracking-wider mb-2">Identifier</label>
             <input
               type="text"
               required
@@ -52,6 +54,18 @@ const Register = () => {
               className="sec-input w-full px-4 py-3 text-[14px]"
               placeholder="agent_name"
               minLength={3}
+            />
+          </div>
+
+          <div>
+            <label className="block text-[12px] font-semibold text-[var(--color-text-secondary)] uppercase tracking-wider mb-2">Comms Channel (Email)</label>
+            <input
+              type="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="sec-input w-full px-4 py-3 text-[14px]"
+              placeholder="agent@network.local"
             />
           </div>
 

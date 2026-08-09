@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { dashboardApi } from '../api/dashboardApi';
+import { authApi } from '../api/authApi';
 import SentFilesTable from '../components/SentFilesTable';
 import ReceivedFilesTable from '../components/ReceivedFilesTable';
 
@@ -9,6 +10,7 @@ const Dashboard = () => {
   const { user } = useAuth();
   
   const [activeTab, setActiveTab] = useState('received');
+  const [generatingKeys, setGeneratingKeys] = useState(false);
   
   const [receivedData, setReceivedData] = useState([]);
   const [receivedLoading, setReceivedLoading] = useState(true);
@@ -74,8 +76,47 @@ const Dashboard = () => {
     }
   };
 
+  const handleGenerateKeys = async () => {
+    setGeneratingKeys(true);
+    try {
+      const blob = await authApi.generateKeys();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${user.username}_private.pem`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      
+      // Reload to refresh the auth context user data
+      window.location.reload(); 
+    } catch (err) {
+      console.error(err);
+      alert('Failed to generate keys. They might already exist.');
+    } finally {
+      setGeneratingKeys(false);
+    }
+  };
+
   return (
     <div className="max-w-6xl mx-auto mt-4 md:mt-8 p-4 animate-fade-in-up w-full">
+      {/* Key Generation Banner */}
+      {!user?.public_key && (
+        <div className="sec-card p-6 mb-8 border border-[var(--color-brand-primary)] bg-[var(--color-brand-primary)]/5 flex flex-col md:flex-row items-center justify-between">
+          <div>
+            <h3 className="text-[var(--color-brand-primary)] font-bold text-lg mb-1">Initialize Encryption</h3>
+            <p className="text-[var(--color-text-secondary)] text-[14px]">You must generate your secure private key before you can receive encrypted files.</p>
+          </div>
+          <button 
+            onClick={handleGenerateKeys} 
+            disabled={generatingKeys}
+            className="mt-4 md:mt-0 sec-btn px-6 py-2.5 rounded-lg"
+          >
+            {generatingKeys ? 'Generating...' : 'Generate & Download Key'}
+          </button>
+        </div>
+      )}
+
       {/* Header Info */}
       <div className="sec-card p-6 md:p-8 mb-8 flex flex-col md:flex-row items-center justify-between relative overflow-hidden">
         

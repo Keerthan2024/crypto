@@ -31,9 +31,16 @@
       radial-gradient(circle at 15% 10%, rgba(0, 208, 132, 0.045), transparent 35%),
       radial-gradient(circle at 80% 80%, rgba(0, 208, 132, 0.025), transparent 45%),
       var(--color-bg-base);
+    background-size: 150% 150%;
     background-attachment: fixed;
+    animation: ambientDrift 20s ease-in-out infinite alternate;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+  }
+  
+  @keyframes ambientDrift {
+    0% { background-position: 0% 0%; }
+    100% { background-position: 100% 100%; }
   }
   
   h1, h2, h3, h4, h5, h6 {
